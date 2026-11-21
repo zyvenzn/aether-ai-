@@ -1,8 +1,14 @@
 import { RELINK_BASE_URL, getApiKey } from "@/lib/relink";
 
-// Daftar model yang tersedia di gateway (untuk dropdown di UI).
+// Daftar model yang tersedia di gateway. Alias "auto" disembunyikan karena
+// gateway saat ini mengembalikan model tersebut tetapi menolak request-nya.
 export async function GET() {
-  const envModel = process.env.RELINK_MODEL || null;
+  const configuredModel = process.env.RELINK_MODEL?.trim() || null;
+  const envModel =
+    configuredModel && configuredModel.toLowerCase() !== "auto"
+      ? configuredModel
+      : null;
+
   const fallback = {
     models: envModel ? [envModel] : [],
     defaultModel: envModel,
@@ -23,13 +29,18 @@ export async function GET() {
     const data = (await res.json()) as { data?: { id?: unknown }[] };
     const ids = (data.data ?? [])
       .map((m) => m.id)
-      .filter((id): id is string => typeof id === "string" && id.length > 0)
+      .filter(
+        (id): id is string =>
+          typeof id === "string" &&
+          id.length > 0 &&
+          id.toLowerCase() !== "auto",
+      )
       .sort();
 
     const models = envModel && !ids.includes(envModel) ? [envModel, ...ids] : ids;
     return Response.json({
       models,
-      defaultModel: envModel ?? models[0] ?? null,
+      defaultModel: envModel && models.includes(envModel) ? envModel : models[0] ?? null,
     });
   } catch {
     return Response.json({ ...fallback, error: "Gagal mengambil daftar model." });
