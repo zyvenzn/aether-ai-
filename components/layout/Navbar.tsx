@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import Container from "@/components/ui/Container";
 import { Sparkles, Menu, X, ArrowRight } from "lucide-react";
 
@@ -32,13 +33,13 @@ export const Navbar = () => {
             <a href="#pricing" className="text-xs font-medium text-white/80 hover:text-white">
               Sign In
             </a>
-            <a
-              href="#pricing"
+            <Link
+              href="/chat"
               className="inline-flex items-center gap-1.5 rounded-xl bg-[#7C3AED] px-4 py-2 text-xs font-semibold text-white shadow-[0_0_15px_rgba(124,58,237,0.4)] transition-all hover:bg-[#6D28D9]"
             >
               <span>Get Started</span>
               <ArrowRight className="h-3.5 w-3.5" />
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Toggle */}
@@ -58,13 +59,13 @@ export const Navbar = () => {
             <a href="#pricing" onClick={() => setIsOpen(false)} className="block text-sm text-white/80">Pricing</a>
             <a href="#faq" onClick={() => setIsOpen(false)} className="block text-sm text-white/80">FAQ</a>
             <hr className="border-white/[0.08]" />
-            <a
-              href="#pricing"
+            <Link
+              href="/chat"
               onClick={() => setIsOpen(false)}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#7C3AED] py-3 text-sm font-semibold text-white"
             >
               Get Started
-            </a>
+            </Link>
           </div>
         )}
       </Container>

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Command } from "lucide-react";
 
@@ -52,13 +53,13 @@ export const HeroContent = () => {
         transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
         className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto"
       >
-        <a
-          href="#pricing"
+        <Link
+          href="/chat"
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#7C3AED] px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#6D28D9] hover:shadow-[0_0_25px_rgba(124,58,237,0.5)] active:scale-[0.98]"
         >
-          <span>Start Free Trial</span>
+          <span>Start Chatting</span>
           <ArrowRight className="h-4 w-4" />
-        </a>
+        </Link>
 
         <button
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-6 py-3.5 text-sm font-semibold text-white/90 transition-all hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.98] backdrop-blur-md"
