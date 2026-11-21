@@ -1,11 +1,14 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import Container from "@/components/ui/Container";
 import GlowEffect from "@/components/shared/GlowEffect";
 import Badge from "@/components/shared/Badge";
 import { ArrowRight, Sparkles, Terminal } from "lucide-react";
+
+const MotionLink = motion.create(Link);
 
 export const CTASection = () => {
   return (
@@ -31,15 +34,15 @@ export const CTASection = () => {
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
-              <motion.a
+              <MotionLink
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
-                href="#pricing"
+                href="/chat"
                 className="inline-flex items-center gap-2 rounded-xl bg-[#7C3AED] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_25px_rgba(124,58,237,0.4)] transition-all hover:bg-[#6D28D9] hover:shadow-[0_0_35px_rgba(124,58,237,0.6)]"
               >
-                <span>Get Started For Free</span>
+                <span>Start Chatting</span>
                 <ArrowRight className="h-4 w-4" />
-              </motion.a>
+              </MotionLink>
 
               <motion.a
                 whileHover={{ scale: 1.03 }}

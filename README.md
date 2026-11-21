@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AETHER.ai
 
-## Getting Started
+Landing page + chat AI (Next.js) yang terhubung ke Re:Link Gateway.
 
-First, run the development server:
+## Jalankan
 
 ```bash
+npm install
+cp .env.example .env.local   # lalu isi RELINK_API_KEY
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `/` — landing page
+- `/chat` — chat AI (riwayat disimpan di browser, jawaban streaming)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variabel | Fungsi |
+| --- | --- |
+| `RELINK_API_KEY` | API key dari dashboard Re:Link Gateway (wajib, hanya di server) |
+| `RELINK_BASE_URL` | Base URL gateway, default `https://api.relink-gateway.biz.id/v1` |
+| `RELINK_MODEL` | Model default (opsional, bisa dipilih lewat dropdown) |
 
-## Learn More
+Di Vercel, isi variabel yang sama di Settings → Environment Variables, lalu redeploy.
 
-To learn more about Next.js, take a look at the following resources:
+## Struktur singkat
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/api/chat/route.ts` — proxy streaming ke `/chat/completions`
+- `app/api/models/route.ts` — daftar model dari gateway
+- `components/chat/` — UI chat
+- `lib/relink.ts` — konfigurasi gateway
