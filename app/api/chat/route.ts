@@ -1,4 +1,4 @@
-import { RELINK_BASE_URL, SYSTEM_PROMPT, getApiKey } from "@/lib/relink";
+import { ACTIVE_MODELS, DEFAULT_MODEL, RELINK_BASE_URL, SYSTEM_PROMPT, getApiKey } from "@/lib/relink";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -42,9 +42,18 @@ export async function POST(req: Request) {
 
   const requestedModel =
     typeof body.model === "string" ? body.model.trim() : "";
-  const model = requestedModel || process.env.RELINK_MODEL;
-  if (!model) {
-    return jsonError("Model belum dipilih.", 400);
+  const configuredModel = process.env.RELINK_MODEL?.trim();
+  const model =
+    requestedModel ||
+    (configuredModel && ACTIVE_MODELS.includes(configuredModel as (typeof ACTIVE_MODELS)[number])
+      ? configuredModel
+      : DEFAULT_MODEL);
+
+  if (!ACTIVE_MODELS.includes(model as (typeof ACTIVE_MODELS)[number])) {
+    return jsonError(
+      "Model tidak tersedia atau sedang nonaktif. Pilih model dari daftar AETHER.",
+      400,
+    );
   }
 
   let upstream: Response;
