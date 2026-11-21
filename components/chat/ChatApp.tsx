@@ -8,7 +8,8 @@ import React, {
   useState,
 } from "react";
 import Link from "next/link";
-import { ArrowUp, Menu, Plus, Sparkles, Square, Trash2, X } from "lucide-react";
+import { ArrowUp, LogOut, Menu, Plus, Sparkles, Square, Trash2, X } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import MessageContent from "./MessageContent";
 
@@ -286,6 +287,13 @@ export default function ChatApp() {
     setConversations((prev) => prev.filter((c) => c.id !== id));
   };
 
+  const logout = async () => {
+    abortRef.current?.abort();
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.assign("/login");
+  };
+
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
     // Di HP, Enter = baris baru. Di desktop, Enter = kirim.
@@ -415,6 +423,9 @@ export default function ChatApp() {
               className="w-32 rounded-lg border border-white/10 bg-[#0A0A0A] px-2 py-1.5 text-xs text-white/80 outline-none placeholder:text-white/30 focus:border-[#7C3AED] sm:w-48"
             />
           )}
+          <button type="button" onClick={logout} aria-label="Logout" title="Logout" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 text-white/55 transition hover:border-red-400/30 hover:bg-red-400/10 hover:text-red-300">
+            <LogOut className="h-4 w-4" />
+          </button>
         </header>
 
         <div className="aether-chat-scroll flex-1 overflow-y-auto">
