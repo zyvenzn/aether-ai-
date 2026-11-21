@@ -99,14 +99,15 @@ export default function ChatApp() {
       .then((r) => r.json())
       .then((data: { models?: string[]; defaultModel?: string | null }) => {
         if (cancelled) return;
-        const list = data.models ?? [];
+        const list = (data.models ?? []).filter(
+          (id) => id.toLowerCase() !== "auto",
+        );
         setModels(list);
         setModel((prev) => {
-          if (list.length === 0) return prev;
           if (prev && list.includes(prev)) return prev;
           return data.defaultModel && list.includes(data.defaultModel)
             ? data.defaultModel
-            : list[0];
+            : list[0] ?? "";
         });
       })
       .catch(() => {});
