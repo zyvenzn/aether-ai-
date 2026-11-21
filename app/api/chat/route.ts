@@ -71,6 +71,27 @@ export async function POST(req: Request) {
 
   if (!upstream.ok || !upstream.body) {
     const detail = await upstream.text().catch(() => "");
+    let gatewayCode = "";
+    let gatewayMessage = "";
+    try {
+      const parsed = JSON.parse(detail) as {
+        error?: { code?: unknown; message?: unknown };
+      };
+      gatewayCode =
+        typeof parsed.error?.code === "string" ? parsed.error.code : "";
+      gatewayMessage =
+        typeof parsed.error?.message === "string" ? parsed.error.message : "";
+    } catch {
+      // Gateway tidak selalu mengembalikan JSON.
+    }
+
+    if (gatewayCode === "model_disabled") {
+      return jsonError(
+        `Model "${model}" sedang dinonaktifkan di Re:Link Gateway. Pilih model yang berstatus aktif di dashboard gateway.`,
+        400,
+      );
+    }
+
     const status =
       upstream.status === 401 || upstream.status === 403
         ? 401
@@ -83,7 +104,8 @@ export async function POST(req: Request) {
         : status === 429
           ? "Kena rate limit atau kuota habis."
           : `Gateway error (${upstream.status}).`;
-    return jsonError(`${hint} ${detail.slice(0, 200)}`.trim(), status);
+    const message = gatewayMessage || detail.slice(0, 200);
+    return jsonError(`${hint} ${message}`.trim(), status);
   }
 
   // Ubah stream SSE (format OpenAI) jadi stream teks polos.
