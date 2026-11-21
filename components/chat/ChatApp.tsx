@@ -296,7 +296,7 @@ export default function ChatApp() {
   };
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-[#050505] text-white selection:bg-[#7C3AED] selection:text-white">
+    <div className="aether-shell flex h-dvh overflow-hidden bg-[#08080B] text-white selection:bg-[#7C3AED] selection:text-white">
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/60 md:hidden"
@@ -307,16 +307,16 @@ export default function ChatApp() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/[0.08] bg-[#0A0A0A] transition-transform duration-200 md:static md:translate-x-0",
+          "aether-sidebar fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/[0.08] bg-[#0D0D12] transition-transform duration-200 md:static md:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between px-5 py-5">
           <Link
             href="/"
             className="flex items-center gap-2 text-base font-bold tracking-tight"
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#7C3AED] shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+            <span className="aether-mark flex h-8 w-8 items-center justify-center rounded-xl bg-[#7C3AED] shadow-[0_0_22px_rgba(124,58,237,0.28)]">
               <Sparkles className="h-4 w-4" />
             </span>
             <span>
@@ -337,7 +337,7 @@ export default function ChatApp() {
           <button
             type="button"
             onClick={newChat}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#7C3AED] px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-[#6D28D9]"
+            className="aether-new-chat flex w-full items-center justify-center gap-2 rounded-xl bg-[#7C3AED] px-3 py-3 text-sm font-semibold transition-colors hover:bg-[#6D28D9]"
           >
             <Plus className="h-4 w-4" />
             Chat baru
@@ -378,7 +378,7 @@ export default function ChatApp() {
 
       {/* Area chat */}
       <main className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-white/[0.08] px-4 py-3">
+        <header className="aether-header flex items-center gap-3 border-b border-white/[0.08] px-4 py-3.5">
           <button
             type="button"
             aria-label="Buka menu"
@@ -417,25 +417,25 @@ export default function ChatApp() {
           )}
         </header>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="aether-chat-scroll flex-1 overflow-y-auto">
           {!active || active.messages.length === 0 ? (
-            <div className="flex min-h-full flex-col items-center justify-center px-4 py-10 text-center">
-              <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#7C3AED] shadow-[0_0_30px_rgba(124,58,237,0.5)]">
+            <div className="aether-empty flex min-h-full flex-col items-center justify-center px-4 py-10 text-center">
+              <span className="aether-empty-mark mb-6 flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#7C3AED] shadow-[0_0_38px_rgba(124,58,237,0.25)]">
                 <Sparkles className="h-7 w-7" />
               </span>
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              <h1 className="aether-title text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
                 Ada yang bisa aku bantu?
               </h1>
-              <p className="mt-2 text-sm text-white/50">
+              <p className="mt-3 max-w-md text-sm leading-6 text-white/45">
                 Tanya apa saja, atau coba salah satu ide di bawah.
               </p>
-              <div className="mt-8 grid w-full max-w-2xl gap-2 sm:grid-cols-2">
+              <div className="aether-suggestions mt-9 grid w-full max-w-2xl gap-3 sm:grid-cols-2">
                 {SUGGESTIONS.map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => void send(s)}
-                    className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-white/80 transition-colors hover:border-[#7C3AED]/50 hover:bg-white/[0.06]"
+                    className="aether-suggestion rounded-2xl border border-white/[0.08] bg-white/[0.025] px-4 py-4 text-left text-sm leading-6 text-white/70 transition-all hover:border-[#7C3AED]/40 hover:bg-white/[0.05] hover:text-white"
                   >
                     {s}
                   </button>
@@ -449,8 +449,8 @@ export default function ChatApp() {
 
                 if (m.role === "user") {
                   return (
-                    <div key={m.id} className="flex justify-end">
-                      <div className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-[#7C3AED] px-4 py-2.5 text-[15px] leading-6 text-white">
+                    <div key={m.id} className="aether-user-row flex justify-end">
+                      <div className="aether-user-bubble max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-[#7C3AED] px-4 py-3 text-[15px] leading-6 text-white">
                         {m.content}
                       </div>
                     </div>
@@ -458,8 +458,8 @@ export default function ChatApp() {
                 }
 
                 return (
-                  <div key={m.id} className="flex gap-3">
-                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#7C3AED]/20 text-[#A855F7]">
+                  <div key={m.id} className="aether-assistant-row flex gap-3">
+                    <span className="aether-assistant-mark mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#7C3AED]/15 text-[#B794F6]">
                       <Sparkles className="h-4 w-4" />
                     </span>
                     <div className="min-w-0 flex-1 pt-0.5">
@@ -486,7 +486,7 @@ export default function ChatApp() {
         </div>
 
         {/* Input */}
-        <div className="px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+        <div className="aether-composer-wrap px-4 pb-[max(0.9rem,env(safe-area-inset-bottom))] pt-3">
           <div className="mx-auto w-full max-w-3xl">
             {error && (
               <div className="mb-2 flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">
@@ -506,7 +506,7 @@ export default function ChatApp() {
                 e.preventDefault();
                 void send(input);
               }}
-              className="flex items-end gap-2 rounded-2xl border border-white/10 bg-[#0A0A0A] p-2 focus-within:border-[#7C3AED]/60"
+              className="aether-composer flex items-end gap-2 rounded-2xl border border-white/[0.1] bg-[#101015] p-2.5 focus-within:border-[#7C3AED]/60"
             >
               <textarea
                 ref={textareaRef}
