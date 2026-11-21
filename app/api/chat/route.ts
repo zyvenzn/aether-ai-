@@ -1,4 +1,5 @@
 import { ACTIVE_MODELS, DEFAULT_MODEL, RELINK_BASE_URL, SYSTEM_PROMPT, getApiKey } from "@/lib/relink";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -13,6 +14,12 @@ function jsonError(message: string, status: number) {
 }
 
 export async function POST(req: Request) {
+  const supabase = await createClient();
+  const { data: authData, error: authError } = await supabase.auth.getClaims();
+  if (authError || !authData?.claims?.sub) {
+    return jsonError("Login diperlukan untuk menggunakan AETHER.", 401);
+  }
+
   const apiKey = getApiKey();
   if (!apiKey) {
     return jsonError("RELINK_API_KEY belum diset di environment server.", 500);
