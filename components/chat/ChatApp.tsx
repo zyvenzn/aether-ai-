@@ -377,7 +377,7 @@ export default function ChatApp() {
       </aside>
 
       {/* Area chat */}
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main className="relative flex min-w-0 flex-1 flex-col bg-[#08080C]">
         <header className="aether-header flex items-center gap-3 border-b border-white/[0.08] px-4 py-3.5">
           <button
             type="button"
@@ -387,7 +387,7 @@ export default function ChatApp() {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <h2 className="min-w-0 flex-1 truncate text-sm font-medium text-white/80">
+          <h2 className="min-w-0 flex-1 truncate text-sm font-semibold tracking-tight text-white/85">
             {active?.title ?? "Chat baru"}
           </h2>
 
@@ -419,9 +419,9 @@ export default function ChatApp() {
 
         <div className="aether-chat-scroll flex-1 overflow-y-auto">
           {!active || active.messages.length === 0 ? (
-            <div className="aether-empty flex min-h-full flex-col items-center justify-center px-4 py-10 text-center">
-              <span className="aether-empty-mark mb-6 flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#7C3AED] shadow-[0_0_38px_rgba(124,58,237,0.25)]">
-                <Sparkles className="h-7 w-7" />
+            <div className="aether-empty flex min-h-full flex-col items-center justify-center px-5 py-8 text-center sm:px-8">
+              <span className="aether-empty-mark mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#7C3AED] shadow-[0_0_32px_rgba(124,58,237,0.22)]">
+                <Sparkles className="h-5 w-5" />
               </span>
               <h1 className="aether-title text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
                 Ada yang bisa aku bantu?
@@ -429,13 +429,13 @@ export default function ChatApp() {
               <p className="mt-3 max-w-md text-sm leading-6 text-white/45">
                 Tanya apa saja, atau coba salah satu ide di bawah.
               </p>
-              <div className="aether-suggestions mt-9 grid w-full max-w-2xl gap-3 sm:grid-cols-2">
+              <div className="aether-suggestions mt-8 grid w-full max-w-2xl grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3">
                 {SUGGESTIONS.map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => void send(s)}
-                    className="aether-suggestion rounded-2xl border border-white/[0.08] bg-white/[0.025] px-4 py-4 text-left text-sm leading-6 text-white/70 transition-all hover:border-[#7C3AED]/40 hover:bg-white/[0.05] hover:text-white"
+                    className="aether-suggestion rounded-2xl border border-white/[0.08] bg-[#111116]/80 px-4 py-3.5 text-left text-[13px] leading-5 text-white/70 transition-all hover:border-[#7C3AED]/40 hover:bg-white/[0.05] hover:text-white sm:px-5 sm:py-4 sm:text-sm"
                   >
                     {s}
                   </button>
@@ -506,7 +506,7 @@ export default function ChatApp() {
                 e.preventDefault();
                 void send(input);
               }}
-              className="aether-composer flex items-end gap-2 rounded-2xl border border-white/[0.1] bg-[#101015] p-2.5 focus-within:border-[#7C3AED]/60"
+              className="aether-composer flex items-end gap-2 rounded-[1.35rem] border border-white/[0.1] bg-[#111116] p-2.5 focus-within:border-[#7C3AED]/60"
             >
               <textarea
                 ref={textareaRef}
