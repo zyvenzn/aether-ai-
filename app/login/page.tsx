@@ -2,13 +2,12 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, LoaderCircle, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +29,9 @@ export default function LoginPage() {
           password,
         });
         if (authError) throw authError;
-        router.replace(searchParams.get("next") || "/chat");
+        const requestedNext = new URLSearchParams(window.location.search).get("next");
+        const safeNext = requestedNext?.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/chat";
+        router.replace(safeNext);
         router.refresh();
       } else {
         const { data, error: authError } = await supabase.auth.signUp({
