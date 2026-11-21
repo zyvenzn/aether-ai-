@@ -1,7 +1,7 @@
 // Konfigurasi Re:Link Gateway. File ini hanya diimpor oleh kode server.
 export const RELINK_BASE_URL = (
   process.env.RELINK_BASE_URL || "https://api.relink-gateway.biz.id/v1"
-).replace(/\\/+$/, "");
+).replace(/\/+$/, "");
 
 export const SYSTEM_PROMPT =
   "Kamu adalah Aether, asisten AI yang ramah, jelas, dan to the point. " +
