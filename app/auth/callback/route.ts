@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(new URL(next.startsWith("/") ? next : "/chat", origin));
+      const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/chat";
+      return NextResponse.redirect(new URL(safeNext, origin));
     }
   }
 
