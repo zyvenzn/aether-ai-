@@ -5,6 +5,7 @@ import { PanelLeft, Search, SquarePen, Trash2, X } from "lucide-react";
 import { HISTORY_GROUPS, type Conversation } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { AetherMark } from "./AetherMark";
+import { AccountFooter } from "./AccountFooter";
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -142,18 +143,7 @@ export function Sidebar({
         </nav>
       </div>
 
-      <div className="flex shrink-0 items-center gap-3 border-t border-line px-4 py-3">
-        <span
-          aria-hidden="true"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-inverse text-sm font-medium text-inverse-ink"
-        >
-          G
-        </span>
-        <div className="min-w-0 leading-tight">
-          <p className="truncate text-sm">Guest</p>
-          <p className="text-xs text-muted">Free plan</p>
-        </div>
-      </div>
+      <AccountFooter />
     </aside>
   );
 }

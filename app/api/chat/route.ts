@@ -1,4 +1,5 @@
 import { MODELS } from "@/lib/chat";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Server-side proxy to the Relink gateway (OpenAI-compatible).
@@ -71,6 +72,12 @@ function fail(error: string, status: number) {
 }
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const { data: auth, error: authError } = await supabase.auth.getClaims();
+  if (authError || !auth?.claims?.sub) {
+    return fail("Login diperlukan untuk menggunakan Aether.", 401);
+  }
+
   const apiKey = process.env.RELINK_API_KEY;
   if (!apiKey) {
     return fail("The server has no API key. Set RELINK_API_KEY and restart.", 500);
