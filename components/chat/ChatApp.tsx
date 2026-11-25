@@ -4,11 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   MODELS,
   SEED_CONVERSATIONS,
-  craftReply,
   makeTitle,
   type Conversation,
   type Message,
 } from "@/lib/chat";
+import { readDeltas } from "@/lib/stream";
 import { cn } from "@/lib/utils";
 import { ChatHeader } from "./ChatHeader";
 import { Composer } from "./Composer";
@@ -18,8 +18,15 @@ import { Sidebar } from "./Sidebar";
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-/** Ticks of silence before the reply starts, so the pulsing dot is visible. */
-const THINKING_TICKS = 15;
+type HistoryItem = Pick<Message, "role" | "content">;
+
+/** What gets sent to the model: real turns only, no empty or error messages. */
+const toHistory = (messages: Message[]): HistoryItem[] =>
+  messages
+    .filter((m) => !m.error && m.content)
+    .map(({ role, content }) => ({ role, content }));
+
+const GENERIC_ERROR = "Something went wrong. Try again.";
 
 export function ChatApp() {
   const [conversations, setConversations] =
@@ -30,25 +37,19 @@ export function ChatApp() {
   const [model, setModel] = useState(MODELS[0].id);
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const active = conversations.find((c) => c.id === activeId) ?? null;
   const messages = active?.messages ?? [];
   const isEmpty = messages.length === 0;
 
-  const clearTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
+  const stopStreaming = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setStreamingId(null);
   }, []);
 
-  const stopStreaming = useCallback(() => {
-    clearTimer();
-    setStreamingId(null);
-  }, [clearTimer]);
-
-  useEffect(() => clearTimer, [clearTimer]);
+  useEffect(() => stopStreaming, [stopStreaming]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -59,15 +60,10 @@ export function ChatApp() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [mobileOpen]);
 
-  /**
-   * Replies are simulated. To use a real model, replace `craftReply` with a
-   * call to your API and feed the streamed text into `setContent`.
-   */
+  /** Streams a reply from /api/chat into the given assistant message. */
   const streamReply = useCallback(
-    (conversationId: string, messageId: string, prompt: string) => {
-      const full = craftReply(prompt);
-
-      const setContent = (content: string) =>
+    async (conversationId: string, messageId: string, history: HistoryItem[]) => {
+      const update = (patch: Partial<Message>) =>
         setConversations((list) =>
           list.map((c) =>
             c.id !== conversationId
@@ -75,33 +71,60 @@ export function ChatApp() {
               : {
                   ...c,
                   messages: c.messages.map((m) =>
-                    m.id === messageId ? { ...m, content } : m,
+                    m.id === messageId ? { ...m, ...patch } : m,
                   ),
                 },
           ),
         );
 
-      clearTimer();
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        setContent(full);
-        setStreamingId(null);
-        return;
-      }
-
-      setContent("");
+      update({ content: "", error: false });
       setStreamingId(messageId);
 
-      let ticks = 0;
-      let shown = 0;
-      timerRef.current = setInterval(() => {
-        if (ticks++ < THINKING_TICKS) return;
-        shown = Math.min(full.length, shown + 4);
-        setContent(full.slice(0, shown));
-        if (shown >= full.length) stopStreaming();
-      }, 24);
+      let text = "";
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model, messages: history }),
+          signal: controller.signal,
+        });
+
+        if (!res.ok || !res.body) {
+          const data = (await res.json().catch(() => null)) as {
+            error?: string;
+          } | null;
+          throw new Error(data?.error ?? GENERIC_ERROR);
+        }
+
+        for await (const delta of readDeltas(res.body)) {
+          text += delta;
+          update({ content: text });
+        }
+
+        if (!text) throw new Error("The model returned an empty reply.");
+      } catch (err) {
+        if (controller.signal.aborted) {
+          if (!text) {
+            update({ content: "Stopped before a reply was generated.", error: true });
+          }
+          return;
+        }
+        update({
+          content: err instanceof Error ? err.message : GENERIC_ERROR,
+          error: true,
+        });
+      } finally {
+        if (abortRef.current === controller) {
+          abortRef.current = null;
+          setStreamingId(null);
+        }
+      }
     },
-    [clearTimer, stopStreaming],
+    [model],
   );
 
   const sendMessage = useCallback(
@@ -111,6 +134,7 @@ export function ChatApp() {
 
       const userMessage: Message = { id: uid(), role: "user", content: text };
       const replyMessage: Message = { id: uid(), role: "assistant", content: "" };
+      const history = toHistory([...(active?.messages ?? []), userMessage]);
 
       let conversationId = activeId;
       if (conversationId === null) {
@@ -135,17 +159,20 @@ export function ChatApp() {
       }
 
       setDraft("");
-      streamReply(conversationId, replyMessage.id, text);
+      void streamReply(conversationId, replyMessage.id, history);
     },
-    [activeId, streamingId, streamReply],
+    [active, activeId, streamingId, streamReply],
   );
 
+  /** Regenerates the last reply, or retries after an error. */
   const regenerate = useCallback(() => {
     if (!active || streamingId) return;
     const last = active.messages[active.messages.length - 1];
-    const prompt = [...active.messages].reverse().find((m) => m.role === "user");
-    if (!last || last.role !== "assistant" || !prompt) return;
-    streamReply(active.id, last.id, prompt.content);
+    if (!last || last.role !== "assistant") return;
+
+    const history = toHistory(active.messages.slice(0, -1));
+    if (history.length === 0) return;
+    void streamReply(active.id, last.id, history);
   }, [active, streamingId, streamReply]);
 
   const newChat = useCallback(() => {

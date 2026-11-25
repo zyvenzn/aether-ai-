@@ -4,6 +4,8 @@ export interface Message {
   id: string;
   role: Role;
   content: string;
+  /** True when `content` is an error message rather than a model reply. */
+  error?: boolean;
 }
 
 export type HistoryGroup = "Today" | "Yesterday" | "Previous 7 days";
@@ -21,9 +23,18 @@ export const HISTORY_GROUPS: HistoryGroup[] = [
   "Previous 7 days",
 ];
 
+/**
+ * Active models from the Relink gateway catalog. `note` is the quota
+ * multiplier the gateway lists for each one. Ids must match the gateway.
+ */
 export const MODELS = [
-  { id: "aether-3", name: "Aether 3.0", note: "Best for complex work" },
-  { id: "aether-3-mini", name: "Aether 3.0 Mini", note: "Faster for everyday tasks" },
+  { id: "auto", name: "Auto", note: "Quota ×1" },
+  { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro", note: "Quota ×1.15" },
+  { id: "glm-5.2", name: "GLM 5.2", note: "Quota ×1.25" },
+  { id: "kimi-k2.7-code", name: "Kimi K2.7 Code", note: "Quota ×1" },
+  { id: "kimi-k2.8", name: "Kimi K2.8", note: "Quota ×2" },
+  { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash", note: "Quota ×2" },
+  { id: "mimo-v2.6-pro", name: "MiMo V2.6 Pro", note: "Quota ×2" },
 ];
 
 export const SUGGESTIONS = [
@@ -97,18 +108,6 @@ const AUTOSCALE_REPLY = [
   "",
   "A CPU target near 70 percent leaves headroom for spikes. Scale down slowly so a short dip does not remove capacity you need a minute later. Tune both numbers against real traffic.",
 ].join("\n");
-
-const FALLBACK_REPLY =
-  "This is a demo of the Aether interface, so replies are simulated and I can only answer the suggested prompts. Connect a model in `sendMessage` to get real answers.";
-
-export function craftReply(prompt: string): string {
-  const text = prompt.toLowerCase();
-  if (/\b(edge|routing|latency)\b/.test(text)) return ROUTING_REPLY;
-  if (/\b(debounce|typescript)\b/.test(text)) return DEBOUNCE_REPLY;
-  if (/\b(status|weekly)\b/.test(text)) return STATUS_REPLY;
-  if (/\b(autoscal\w*|scaling|worker|pool)\b/.test(text)) return AUTOSCALE_REPLY;
-  return FALLBACK_REPLY;
-}
 
 export function makeTitle(prompt: string): string {
   const clean = prompt.replace(/\s+/g, " ").trim();

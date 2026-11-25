@@ -14,8 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Aether",
-  description:
-    "Aether is an AI assistant for engineering teams. This build is a demo with simulated replies.",
+  description: "Aether is an AI assistant for engineering teams.",
 };
 
 export const viewport: Viewport = {

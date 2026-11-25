@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aether
 
-## Getting Started
+A ChatGPT-style chat interface built with Next.js and Tailwind CSS. Replies come from the [Relink gateway](https://api.relink-gateway.biz.id/v1), an OpenAI-compatible API.
 
-First, run the development server:
+## Setup
+
+1. Copy `.env.example` to `.env.local`.
+2. Set `RELINK_API_KEY` to the key from your Relink dashboard (Integrasi API → API key).
+3. Install and run:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The key is only read on the server, in `app/api/chat/route.ts`. Do not prefix it with `NEXT_PUBLIC_` and do not commit `.env.local`. When you deploy, add `RELINK_API_KEY` (and optionally `RELINK_BASE_URL`) to your host's environment variables.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How it works
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/api/chat/route.ts` validates the request, adds a system prompt, and streams the gateway's response back. It limits models, message count and length, output tokens, and requests per IP.
+- `lib/stream.ts` reads the streamed text in the browser.
+- `lib/chat.ts` lists the models shown in the picker. The ids must match the gateway's catalog. Each model uses quota at the multiplier shown in the Relink dashboard.
+- `components/chat/` holds the interface.

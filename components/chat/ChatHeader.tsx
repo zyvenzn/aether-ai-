@@ -65,7 +65,7 @@ function ModelPicker({ model, onChange }: ModelPickerProps) {
         <div
           role="group"
           aria-label="Choose a model"
-          className="absolute left-0 top-full z-20 mt-1 w-72 rounded-2xl border border-line bg-elevated p-1.5 shadow-xl"
+          className="absolute left-0 top-full z-20 mt-1 max-h-[60vh] w-72 overflow-y-auto rounded-2xl border border-line bg-elevated p-1.5 shadow-xl"
         >
           {MODELS.map((m) => (
             <button

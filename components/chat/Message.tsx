@@ -64,6 +64,26 @@ function AssistantMessage({
     }
   }
 
+  if (message.error) {
+    return (
+      <div>
+        <p
+          role="alert"
+          className="rounded-2xl border border-line px-4 py-3 text-sm leading-6"
+        >
+          {message.content}
+        </p>
+        {isLast && !isStreaming && (
+          <div className="-ml-2 mt-2">
+            <Action label="Try again" onClick={onRegenerate}>
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            </Action>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div>
       {message.content && <RichText content={message.content} />}

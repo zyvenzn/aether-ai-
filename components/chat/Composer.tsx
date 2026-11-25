@@ -82,7 +82,7 @@ export function Composer({
       </form>
 
       <p className="px-2 pt-2 text-center text-xs text-muted">
-        Replies in this demo are simulated. Aether can make mistakes.
+        Aether can make mistakes. Check important info.
       </p>
     </div>
   );
