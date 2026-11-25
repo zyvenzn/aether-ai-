@@ -1,26 +1,119 @@
 @import "tailwindcss";
 
+/*
+ * Tokens follow the system color scheme. Light and dark values are kept
+ * as plain CSS variables so every component reads the same names.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  color-scheme: light dark;
+  --canvas: #ffffff;
+  --sidebar: #f9f9f9;
+  --elevated: #ffffff;
+  --composer: #ffffff;
+  --hover: #ececec;
+  --bubble: #f4f4f4;
+  --line: rgb(0 0 0 / 0.1);
+  --line-strong: rgb(0 0 0 / 0.2);
+  --ink: #0d0d0d;
+  --muted: #5d5d5d;
+  --inverse: #0d0d0d;
+  --inverse-ink: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --canvas: #212121;
+    --sidebar: #171717;
+    --elevated: #2f2f2f;
+    --composer: #303030;
+    --hover: #2a2a2a;
+    --bubble: #303030;
+    --line: rgb(255 255 255 / 0.12);
+    --line-strong: rgb(255 255 255 / 0.22);
+    --ink: #ececec;
+    --muted: #b0b0b0;
+    --inverse: #ffffff;
+    --inverse-ink: #0d0d0d;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
+
+  --color-canvas: var(--canvas);
+  --color-sidebar: var(--sidebar);
+  --color-elevated: var(--elevated);
+  --color-composer: var(--composer);
+  --color-hover: var(--hover);
+  --color-bubble: var(--bubble);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-inverse: var(--inverse);
+  --color-inverse-ink: var(--inverse-ink);
+
+  /* Code blocks stay dark in both themes. */
+  --color-code-body: #0d0d0d;
+  --color-code-head: #2f2f2f;
+  --color-code-ink: #ececec;
+  --color-code-muted: #b4b4b4;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+}
+
+@keyframes aether-pulse {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.stream-dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  background: var(--ink);
+  animation: aether-pulse 1.1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stream-dot {
+    animation: none;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+  }
 }
