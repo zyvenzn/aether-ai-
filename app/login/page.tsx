@@ -15,6 +15,27 @@ export default function LoginPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  async function handleGoogle() {
+    setBusy(true);
+    setError("");
+    setMessage("");
+    try {
+      const requestedNext = new URLSearchParams(window.location.search).get("next");
+      const safeNext = requestedNext?.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/";
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+        },
+      });
+      if (authError) throw authError;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login Google gagal. Coba lagi.");
+      setBusy(false);
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -72,7 +93,16 @@ export default function LoginPage() {
           <h1 className="text-3xl font-semibold tracking-[-.05em]">{mode === "login" ? "Welcome back." : "Create your account."}</h1>
           <p className="mt-2 text-sm leading-6 text-white/45">{mode === "login" ? "Sign in to continue to your workspace." : "Create an account to start using AETHER."}</p>
 
-          <div className="mt-7 grid grid-cols-2 rounded-xl border border-white/10 bg-black/20 p-1">
+          <button type="button" onClick={handleGoogle} disabled={busy} className="mt-7 flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-white text-sm font-semibold text-[#1f1f1f] transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60">
+            <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.81Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.92l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.1A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.27 14.27a7.2 7.2 0 0 1 0-4.54v-3.1H1.26a12 12 0 0 0 0 10.74l4.01-3.1Z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.35.61 4.6 1.8l3.44-3.44A11.5 11.5 0 0 0 12 0 12 12 0 0 0 1.26 6.63l4.01 3.1C6.22 6.88 8.87 4.77 12 4.77Z"/></svg>
+            Lanjutkan dengan Google
+          </button>
+
+          <div className="my-6 flex items-center gap-3 text-[11px] uppercase tracking-widest text-white/30">
+            <span className="h-px flex-1 bg-white/10" />atau pakai email<span className="h-px flex-1 bg-white/10" />
+          </div>
+
+          <div className="grid grid-cols-2 rounded-xl border border-white/10 bg-black/20 p-1">
             <button type="button" onClick={() => { setMode("login"); setError(""); setMessage(""); }} className={`rounded-lg px-3 py-2.5 text-sm font-medium transition ${mode === "login" ? "bg-violet-500 text-white" : "text-white/45 hover:text-white"}`}>Log in</button>
             <button type="button" onClick={() => { setMode("signup"); setError(""); setMessage(""); }} className={`rounded-lg px-3 py-2.5 text-sm font-medium transition ${mode === "signup" ? "bg-violet-500 text-white" : "text-white/45 hover:text-white"}`}>Sign up</button>
           </div>
